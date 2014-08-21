@@ -11,6 +11,7 @@ import (
 
 func TestSetOpenFunc(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	SetOpenFunc(func(dsn string) (driver.Conn, error) {
 		return Conn(), errors.New("test error")
@@ -35,6 +36,7 @@ func TestSetOpenFunc(t *testing.T) {
 
 func TestStubQuery(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -67,6 +69,7 @@ func TestStubQuery(t *testing.T) {
 
 func TestStubQueryAdditionalWhitespace(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -100,6 +103,7 @@ func TestStubQueryAdditionalWhitespace(t *testing.T) {
 
 func TestStubQueryChangeCase(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -133,6 +137,7 @@ func TestStubQueryChangeCase(t *testing.T) {
 
 func TestUnknownQuery(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -146,6 +151,7 @@ func TestUnknownQuery(t *testing.T) {
 
 func TestStubQueryError(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -166,6 +172,7 @@ func TestStubQueryError(t *testing.T) {
 
 func TestStubQueryRowError(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -184,6 +191,7 @@ func TestStubQueryRowError(t *testing.T) {
 
 func TestStubQueryMultipleResult(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -225,6 +233,7 @@ func TestStubQueryMultipleResult(t *testing.T) {
 
 func TestStubQueryMultipleResultNewline(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -263,6 +272,7 @@ func TestStubQueryMultipleResultNewline(t *testing.T) {
 
 func TestSetQueryFunc(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	columns := []string{"id", "name", "age", "created"}
 	rows := "1,tim,20,2012-10-01 01:00:01\n2,joe,25,2012-10-02 02:00:02\n3,bob,30,2012-10-03 03:00:03"
@@ -306,6 +316,7 @@ func TestSetQueryFunc(t *testing.T) {
 
 func TestSetQueryFuncError(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	SetQueryFunc(func(query string) (result driver.Rows, err error) {
 		return nil, errors.New("stubbed error")
@@ -335,6 +346,7 @@ func TestReset(t *testing.T) {
 
 func TestStubQueryRow(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -365,6 +377,7 @@ func TestStubQueryRow(t *testing.T) {
 
 func TestStubQueryRowReuse(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -397,6 +410,7 @@ func TestStubQueryRowReuse(t *testing.T) {
 
 func TestSetQueryFuncRow(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	columns := []string{"id", "name", "age", "created"}
 	rows := "1,tim,20,2012-10-01 01:00:01"
@@ -427,6 +441,7 @@ func TestSetQueryFuncRow(t *testing.T) {
 
 func TestSetQueryFuncRowError(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	SetQueryFunc(func(query string) (result driver.Rows, err error) {
 		return nil, errors.New("Stubbed error")
@@ -450,6 +465,7 @@ func TestSetQueryFuncRowError(t *testing.T) {
 
 func TestStubExec(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -478,6 +494,7 @@ func TestStubExec(t *testing.T) {
 
 func TestStubExecError(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -497,6 +514,7 @@ func TestStubExecError(t *testing.T) {
 
 func TestStubExecFunc(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -529,6 +547,7 @@ func TestStubExecFunc(t *testing.T) {
 
 func TestStubExecFuncError(t *testing.T) {
 	defer Reset()
+	EnableTimeParsing(false)
 
 	db, _ := sql.Open("testdb", "")
 
@@ -553,7 +572,7 @@ func TestDisabledTimeParsing(t *testing.T) {
 	defer Reset()
 
 	columns := []string{"created"}
-	rows := "2012-10-01T01:00:01-03:00"
+	rows := "2012-10-01 01:00:01"
 
 	SetQueryFunc(func(query string) (result driver.Rows, err error) {
 		return RowsFromCSVString(columns, rows), nil
@@ -602,7 +621,7 @@ func TestEnableTimeParsing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if u.created.Format(time.RFC3339) != "2012-10-01T01:00:01-03:00" {
+	if u.created.Format("2006-01-02 15:04:05") != "2012-10-01 01:00:01" {
 		t.Fatal("failed to populate time object with result")
 	}
 }

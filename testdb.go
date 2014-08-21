@@ -34,7 +34,8 @@ type query struct {
 func newDriver() *testDriver {
 	return &testDriver{
 		conn:              newConn(),
-		timeParsingFormat: time.RFC3339,
+		enableTimeParsing: true,
+		timeParsingFormat: "2006-01-02 15:04:05",
 	}
 }
 
@@ -156,7 +157,7 @@ func RowsFromCSVString(columns []string, s string) driver.Rows {
 			v := strings.TrimSpace(v)
 
 			// If enableTimeParsing is on, check to see if this is a
-			// time in defined format (RFC33339 by default)
+			// time in defined format (RFC3339 by default)
 			if d.enableTimeParsing {
 				if time, err := time.Parse(d.timeParsingFormat, v); err == nil {
 					row[i] = time
