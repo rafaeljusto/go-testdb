@@ -599,7 +599,7 @@ func TestEnableTimeParsing(t *testing.T) {
 	defer Reset()
 
 	columns := []string{"created"}
-	rows := "2012-10-01T01:00:01-03:00"
+	rows := "2012-10-01 01:00:01"
 
 	SetQueryFunc(func(query string) (result driver.Rows, err error) {
 		return RowsFromCSVString(columns, rows), nil
