@@ -626,6 +626,42 @@ func TestEnableTimeParsing(t *testing.T) {
 	}
 }
 
+func TestZeroTimeParsing(t *testing.T) {
+	defer Reset()
+
+	columns := []string{"created"}
+	rows := []string{
+		"0000-00-00 00:00:00",
+		"0001-01-01 00:00:00",
+	}
+
+	for _, row := range rows {
+		SetQueryFunc(func(query string) (result driver.Rows, err error) {
+			return RowsFromCSVString(columns, row), nil
+		})
+
+		if Conn().(*conn).queryFunc == nil {
+			t.Fatal("query function not stubbed")
+		}
+
+		EnableTimeParsing(true)
+		db, _ := sql.Open("testdb", "")
+
+		row := db.QueryRow("SELECT foo FROM bar")
+
+		var u = struct{ created time.Time }{}
+		err := row.Scan(&u.created)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !u.created.IsZero() {
+			t.Fatal("failed to populate time object with result")
+		}
+	}
+}
+
 func TestEnableTimeParsingWithFormat(t *testing.T) {
 	defer Reset()
 
