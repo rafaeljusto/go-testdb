@@ -164,10 +164,10 @@ func RowsFromCSVString(columns []string, s string) driver.Rows {
 				} else if v == "0000-00-00 00:00:00" {
 					row[i] = time.Time{}
 				} else {
-					row[i] = v
+					row[i] = []byte(v)
 				}
 			} else {
-				row[i] = v
+				row[i] = []byte(v)
 			}
 		}
 
@@ -178,6 +178,28 @@ func RowsFromCSVString(columns []string, s string) driver.Rows {
 }
 
 func RowsFromSlice(columns []string, data [][]driver.Value) driver.Rows {
+	for i, row := range data {
+		for j, value := range row {
+			if v, ok := value.(string); ok {
+				v := strings.TrimSpace(v)
+
+				// If enableTimeParsing is on, check to see if this is a
+				// time in defined format (RFC3339 by default)
+				if d.enableTimeParsing {
+					if t, err := time.Parse(d.timeParsingFormat, v); err == nil {
+						data[i][j] = t
+					} else if v == "0000-00-00 00:00:00" {
+						data[i][j] = time.Time{}
+					} else {
+						data[i][j] = []byte(v)
+					}
+				} else {
+					data[i][j] = []byte(v)
+				}
+			}
+		}
+	}
+
 	return &rows{
 		closed:  false,
 		columns: columns,
