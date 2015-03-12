@@ -196,6 +196,9 @@ func RowsFromSlice(columns []string, data [][]driver.Value) driver.Rows {
 				} else {
 					data[i][j] = []byte(v)
 				}
+
+			} else if v, ok := value.(int); ok {
+				data[i][j] = int64(v)
 			}
 		}
 	}
