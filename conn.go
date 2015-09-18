@@ -36,7 +36,7 @@ func (c *conn) Prepare(query string) (driver.Stmt, error) {
 	}
 
 	if q, ok := d.conn.queries[getQueryHash(query)]; ok {
-		if s.queryFunc == nil && q.rows != nil {
+		if s.queryFunc == nil {
 			s.queryFunc = func(args []driver.Value) (driver.Rows, error) {
 				if q.rows != nil {
 					if rows, ok := q.rows.(*rows); ok {
@@ -48,7 +48,7 @@ func (c *conn) Prepare(query string) (driver.Stmt, error) {
 			}
 		}
 
-		if s.execFunc == nil && q.result != nil {
+		if s.execFunc == nil {
 			s.execFunc = func(args []driver.Value) (driver.Result, error) {
 				if q.result != nil {
 					return q.result, nil
