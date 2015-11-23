@@ -199,7 +199,12 @@ func RowsFromCSVString(columns []string, s string, c ...rune) driver.Rows {
 			// time in defined format (RFC3339 by default)
 			if d.enableTimeParsing {
 				if t, err := time.Parse(d.timeParsingFormat, v); err == nil {
-					row[i] = t
+					// avoid setting the UTC timezone if the date is zero
+					if t.IsZero() {
+						row[i] = time.Time{}
+					} else {
+						row[i] = t
+					}
 				} else if v == "0000-00-00 00:00:00" {
 					row[i] = time.Time{}
 				} else {
@@ -226,7 +231,12 @@ func RowsFromSlice(columns []string, data [][]driver.Value) driver.Rows {
 				// time in defined format (RFC3339 by default)
 				if d.enableTimeParsing {
 					if t, err := time.Parse(d.timeParsingFormat, v); err == nil {
-						data[i][j] = t
+						// avoid setting the UTC timezone if the date is zero
+						if t.IsZero() {
+							data[i][j] = time.Time{}
+						} else {
+							data[i][j] = t
+						}
 					} else if v == "0000-00-00 00:00:00" {
 						data[i][j] = time.Time{}
 					} else {
